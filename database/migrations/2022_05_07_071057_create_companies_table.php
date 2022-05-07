@@ -22,7 +22,7 @@ return new class extends Migration
             $table->boolean('status');
             $table->timestamps();
 
-            $table->foreign('category_id')->references('id')->on('company_categories')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('company_categories');
         });
     }
 

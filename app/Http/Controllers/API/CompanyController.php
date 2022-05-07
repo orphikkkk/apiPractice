@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use Dotenv\Validator;
 use Illuminate\Http\Request;
+use function GuzzleHttp\Promise\all;
 
 class CompanyController extends Controller
 {
@@ -16,12 +18,11 @@ class CompanyController extends Controller
     public function index(Request $request)
     {
         $companies = Company::query();
-        if ($request->has('category_id')){
-            $companies->with('category')
-                ->paginate(10);
-        }else {
-            $companies->paginate(10);
+        if ($request->has('category_id')) {
+            $companies = $companies->with('category');
         }
+        $companies = $companies->paginate(10);
+
         return response()->json($companies);
     }
 
@@ -43,10 +44,13 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
+        //Validation Message is not used in this project due to time constraints
         $request->validate([
             'title' => 'required|max:255',
-            'status' => 'required'
+            'status' => 'required',
+            'category_id' => 'exists:company_categories,id'
         ]);
+
         $newCompany = new Company;
         if($request->hasFile('image')){
             $request->validate([
@@ -61,7 +65,6 @@ class CompanyController extends Controller
             $newCompany->title = $request->get('title');
             $newCompany->description = $request->get('description');
             $newCompany->status = $request->get('status');
-
         $newCompany->save();
         return response()->json([ "success" => true, "entities" => $newCompany::all()], 200);
     }
@@ -76,11 +79,9 @@ class CompanyController extends Controller
     {
         $companies = Company::query()->where('id',$id);
         if ($request->has('category_id')){
-            $companies->with('category')
-                ->paginate(10);
-        }else {
-            $companies->paginate(10);
+           $companies =  $companies->with('category');
         }
+        $companies = $companies->paginate(10);
         return response()->json($companies);
     }
 
@@ -104,6 +105,10 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //Validation Message is not used in this project due to time constraints
+        $request->validate([
+            'category_id' => 'exists:company_categories,id'
+        ]);
         $newCompany = Company::query()->findOrFail($id);
         if($request->hasFile('image')){
             $request->validate([
