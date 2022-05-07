@@ -23,11 +23,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 /*
      * Category
      * */
-    Route::apiResource('category', CategoryController::class);
+    Route::apiResource('category', CategoryController::class)->middleware('keyAuthorize');
 
 
 /*
      * Company
      * */
-    Route::apiResource('company', CompanyController::class);
+    Route::apiResource('company', CompanyController::class)->middleware('keyAuthorize');
 

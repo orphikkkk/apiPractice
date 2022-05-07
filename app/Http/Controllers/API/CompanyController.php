@@ -4,9 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use Dotenv\Validator;
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
-use function GuzzleHttp\Promise\all;
+use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
@@ -139,7 +139,12 @@ class CompanyController extends Controller
     public function destroy($id)
     {
         $company = Company::query()->findOrFail($id);
+        $imageName = $company->image;
         $company->delete();
+        $image_path = public_path("images\\"). $imageName;
+        if(Storage::exists($image_path)){
+            Storage::delete($image_path);
+        }
         return response()->json([ "success" => true, "entities" => $company::all()], 200);
     }
 }
